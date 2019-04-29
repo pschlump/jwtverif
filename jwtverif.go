@@ -123,7 +123,7 @@ func SignToken(tokData []byte, keyFile, keyType string) (out string, err error) 
 	// get the signing alg
 	alg := jwt.GetSigningMethod(Alg)
 	if alg == nil {
-		err = fmt.Errorf("Couldn't find signing method: %v", Alg) // xyzzy Param
+		err = fmt.Errorf("Couldn't find signing method: [%v]", Alg) // xyzzy Param
 		return
 	}
 
@@ -157,6 +157,8 @@ func SignToken(tokData []byte, keyFile, keyType string) (out string, err error) 
 				return
 			}
 		}
+	} else {
+		err = fmt.Errorf("Error signing token - confg error: keyType=[%s]", keyType)
 	}
 
 	if out, err = token.SignedString(key); err == nil {
@@ -220,6 +222,9 @@ func VerifyToken(tokData []byte, keyFile, keyType string) (iat string, err error
 			return jwt.ParseECPublicKeyFromPEM(data)
 		} else if isRs(keyType) {
 			return jwt.ParseRSAPublicKeyFromPEM(data)
+		} else {
+			err = fmt.Errorf("Error signing token - confg error: keyType=[%s]", keyType)
+			return "", err
 		}
 		return data, nil
 	})
