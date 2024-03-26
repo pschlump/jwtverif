@@ -12,9 +12,9 @@ import (
 	"regexp"
 	"strings"
 
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/pschlump/godebug"
-	"github.com/pschlump/json" //	"encoding/json"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/pschlump/dbgo"
+	"github.com/pschlump/json"
 )
 
 // From: crud.go:5882(ish)
@@ -22,8 +22,8 @@ import (
 // // xyzzy-JWT
 // func CreateJWTToken(res http.ResponseWriter, req *http.Request, cfgTag string, rv string, isError bool, cookieList map[string]string, ps *goftlmux.Params, trx *tr.Trx, hdlr *TabServer2Type) (string, bool, int) {
 //
-// 	fmt.Printf("%sAT:%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, godebug.LF())
-// 	fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, godebug.LF())
+// 	fmt.Printf("%sAT:%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, dbgo.LF())
+// 	fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, dbgo.LF())
 //
 // 	// func SignToken(tokData []byte, keyFile string) (out string, err error) {
 // 	//	hdlr.KeyFilePrivate        string                      // private key file for signing JWT tokens
@@ -48,37 +48,37 @@ import (
 //
 // 	if ed.Status == "success" && len(ed.JWTClaims) > 0 {
 //
-// 		fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, godebug.LF())
+// 		fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, dbgo.LF())
 //
 // 		claims := make(map[string]string)
 // 		for _, vv := range ed.JWTClaims {
 // 			claims[vv] = all[vv].(string)
 // 			// delete(all, vv)
 // 		}
-// 		tokData := godebug.SVar(claims)
+// 		tokData := dbgo.SVar(claims)
 //
-// 		fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, godebug.LF())
+// 		fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, dbgo.LF())
 //
 // 		signedKey, err := SignToken([]byte(tokData), hdlr.KeyFilePrivate)
 // 		if err != nil {
 // 			all["status"] = "error"
 // 			all["msg"] = fmt.Sprintf("Error: Unable to sign the JWT token, %s", err)
 // 			delete(all, "$JWT-claims$")
-// 			rv = godebug.SVar(all)
+// 			rv = dbgo.SVar(all)
 //
 // 			fmt.Printf("Error: Unable to sign the JWT token, %s\n", err)
 // 			fmt.Fprintf(os.Stderr, "Error: Unable to sign the JWT token, %s\n", err)
 // 			return rv, true, 406
 // 		}
 //
-// 		fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top signedKey = -->>%s<<-- %s\n", MiscLib.ColorYellow, MiscLib.ColorReset, signedKey, godebug.LF())
+// 		fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top signedKey = -->>%s<<-- %s\n", MiscLib.ColorYellow, MiscLib.ColorReset, signedKey, dbgo.LF())
 //
 // 		all["jwt_token"] = signedKey
 //
 // 		delete(all, "$JWT-claims$")
 //
-// 		rv = godebug.SVar(all)
-// 		fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, godebug.LF())
+// 		rv = dbgo.SVar(all)
+// 		fmt.Fprintf(os.Stderr, "%s **** AT **** :%s at top rv = -->>%s<<-- %s\n", MiscLib.ColorBlue, MiscLib.ColorReset, rv, dbgo.LF())
 // 		return rv, false, 200
 // 	}
 //
@@ -97,7 +97,7 @@ func SignToken(tokData []byte, keyFile, keyType string) (out string, err error) 
 	}
 
 	fmt.Printf("Siging: %s\n", tokData)
-	fmt.Printf("Claims: %s\n", godebug.SVarI(claims))
+	fmt.Printf("Claims: %s\n", dbgo.SVarI(claims))
 
 	//-	// add command line claims
 	//-	if len(flagClaims) > 0 {
@@ -246,7 +246,7 @@ func VerifyToken(tokData []byte, keyFile, keyType string) (iat string, err error
 	}
 
 	if db100 {
-		fmt.Fprintf(os.Stderr, "Token Claims: %s\n", godebug.SVarI(token.Claims))
+		fmt.Fprintf(os.Stderr, "Token Claims: %s\n", dbgo.SVarI(token.Claims))
 	}
 
 	// {"auth_token":"f5d8f6ae-e2e5-42c9-83a9-dfd07825b0fc"}
@@ -254,7 +254,7 @@ func VerifyToken(tokData []byte, keyFile, keyType string) (iat string, err error
 		AuthToken string `json:"auth_token"`
 	}
 	var gt GetAuthToken
-	cl := godebug.SVar(token.Claims)
+	cl := dbgo.SVar(token.Claims)
 	if db100 {
 		fmt.Fprintf(os.Stderr, "Claims just before -->>%s<<--\n", cl)
 	}
